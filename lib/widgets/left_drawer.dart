@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supercopa/screens/menu.dart';
 import 'package:supercopa/screens/productlist_form.dart';
 
-
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
@@ -13,62 +12,64 @@ class LeftDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-            gradient: LinearGradient(
+              gradient: LinearGradient(
                 colors: [
-                  Color(0xFF5D753E),
-                  Color(0xFFB1CC8F),
-                  Color(0xFFA0B981),
-                  Color(0xFF6F8C4A),
+                  Color(0xFFF8BDBD),
+                  Color(0xFFDDE255),
+                  Color(0xFFF98805),
+                  Color(0xFFF35695),
+                  Color(0xFF264414),
                 ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
-          ),
-          child: Column(
-            children: [
-              Text(
-                'Supercopa',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Supercopa',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              Padding(padding: EdgeInsets.all(10)),
-              Text("Seluruh produk sepak bola terbaik ada di sini!",
+                Padding(padding: EdgeInsets.all(10)),
+                Text(
+                  "Seluruh produk sepak bola terbaik ada di sini!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white,
                     fontWeight: FontWeight.normal,
                   ),
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
-            // Bagian redirection ke MyHomePage
             onTap: () {
               Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ),
+              );
             },
           ),
           ListTile(
             leading: const Icon(Icons.post_add),
             title: const Text('Create Product'),
-            // Bagian redirection ke ProductFormPage
             onTap: () {
               Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProductFormPage(),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductFormPage(),
+                ),
+              );
             },
           ),
         ],
