@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supercopa/screens/menu.dart';
 import 'package:supercopa/screens/productlist_form.dart';
+import 'package:supercopa/screens/product_entry_list.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -42,32 +43,31 @@ class LeftDrawer extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white,
-                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],
             ),
           ),
+
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
-                ),
+                MaterialPageRoute(builder: (context) => MyHomePage()),
               );
             },
           ),
+
           ListTile(
-            leading: const Icon(Icons.post_add),
-            title: const Text('Create Product'),
+            leading: const Icon(Icons.add_reaction_rounded),
+            title: const Text('Product List'),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProductFormPage(),
+                  builder: (context) => const ProductEntryListPage(),
                 ),
               );
             },

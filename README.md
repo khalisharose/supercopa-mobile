@@ -41,3 +41,60 @@ Tugas 8
 
  4. Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
    Saya menyesuaikan warna tema agar aplikasi Supercopa memiliki identitas visual yang konsisten dengan brand toko. Tema utama menggunakan kombinasi warna pink fanta (#F35695) dan pink soft (#F8BDBD) untuk memberikan kesan energik, modern, dan sporty. Warna oranye (#F98805) digunakan sebagai aksen pada tombol dan elemen interaktif agar terlihat hangat dan menarik. Selain itu, warna hijau tua (#264414) dan kuning lime (#DDE255) digunakan secara halus untuk menyeimbangkan tampilan agar tetap segar dan dinamis. Semua warna tersebut diterapkan secara konsisten pada AppBar, tombol, teks, dan latar belakang melalui pengaturan ThemeData di MaterialApp, sehingga aplikasi Supercopa memiliki identitas visual yang unik dan mudah dikenali.
+
+Tugas 9
+1. Jelaskan mengapa kita perlu membuat model Dart saat mengambil/mengirim data JSON? Apa konsekuensinya jika langsung memetakan Map<String, dynamic> tanpa model (terkait validasi tipe, null-safety, maintainability)?
+   1. Model Dart membuat struktur data menjadi konsisten, aman, dan terprediksi, karena setiap field sudah memiliki tipe yang jelas (String, int, bool, dan lain-lain).
+
+   2. Model memberikan type-safety, sehingga kesalahan tipe terdeteksi saat compile, bukan saat aplikasi sudah jalan.
+   3. Null-safety lebih terkendali, karena kita bisa menentukan mana yang wajib dan mana yang bisa null.
+   4. Kode lebih mudah dirawat dan diubah; jika backend berubah, kita cukup mengupdate satu file model.
+   5. Tanpa model dan hanya memakai Map<String, dynamic>, konsekuensinya:
+         1. rawan typo key (contentt, is_fetured).
+         2. rawan runtime error karena salah tipe data.
+         3. data tidak tervalidasi dan sulit dilacak.
+         4. kode lebih berantakan dan tidak scalable.
+
+2. Apa fungsi package http dan CookieRequest dalam tugas ini? Jelaskan perbedaan peran http vs CookieRequest. Jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+
+http adalah package umum untuk melakukan request (GET/POST). Cocok untuk API publik dan request tanpa autentikasi.
+Sedangkan CookieRequest adalah class khusus dari pbp_django_auth untuk komunikasi dengan Django yang membutuhkan:
+penyimpanan cookie session, pengelolaan CSRF token, login, logout, dan request yang membutuhkan authentikasi.
+
+Perbedaan singkat:
+http → tidak menyimpan cookie, tidak otomatis kirim CSRF, tidak cocok untuk endpoint Django yang butuh login.
+CookieRequest → menyimpan session, mengirim cookie di setiap request, dan mendukung login/logout.
+
+3. Jelaskan konfigurasi konektivitas yang diperlukan agar Flutter dapat berkomunikasi dengan Django. Mengapa kita perlu menambahkan 10.0.2.2 pada ALLOWED_HOSTS, mengaktifkan CORS dan pengaturan SameSite/cookie, dan menambahkan izin akses internet di Android? Apa yang akan terjadi jika konfigurasi tersebut tidak dilakukan dengan benar?
+   1. CookieRequest menyimpan cookie session yang didapat saat login.
+   2. Jika setiap halaman membuat instance CookieRequest baru, instance baru tersebut tidak tahu bahwa user sudah login, karena cookie-nya tidak ada.
+   3. Dengan membagikan satu instance CookieRequest menggunakan Provider:
+      1. semua halaman menggunakan session yang sama,
+      2. status login tetap konsisten,
+      3. request ke Django selalu membawa cookie yang benar.
+
+4. Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+   Agar Flutter dapat berkomunikasi dengan Django, beberapa konfigurasi penting harus dilakukan baik pada sisi backend maupun sisi Flutter. Pertama, emulator Android tidak bisa langsung mengakses localhost komputer host, sehingga alamat khusus 10.0.2.2 harus digunakan sebagai jembatan. Untuk itu, Django wajib memasukkan alamat tersebut ke dalam ALLOWED_HOSTS, misalnya: ["10.0.2.2", "localhost", "127.0.0.1"]. Jika tidak ditambahkan, Django akan menolak seluruh request dari Flutter dengan error DisallowedHost. Selain itu, kita juga harus mengaktifkan CORS karena Flutter (sebagai aplikasi berbeda origin) akan melakukan request lintas domain. Tanpa CORS, permintaan dari aplikasi akan diblok oleh browser atau emulator sehingga data tidak dapat diambil. Pengaturan cookie juga harus diperhatikan, terutama opsi SameSite dan session cookie agar cookie Django bisa terkirim dalam setiap request yang menggunakan autentikasi. Jika konfigurasi cookie salah, Flutter tidak dapat mempertahankan status login dan user akan dianggap selalu logout. Di sisi Flutter/Android, aplikasi wajib memiliki izin akses internet pada manifest. Tanpa izin ini, semua request HTTP otomatis gagal sebelum mencapai server. Jika keseluruhan konfigurasi ini tidak dilakukan dengan benar, Flutter tidak akan bisa mengambil ataupun mengirim data ke Django, proses login gagal, dan semua fitur yang membutuhkan komunikasi backend tidak berfungsi.
+
+5. Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+   1. User mengisi form di Flutter.
+   2. Form divalidasi dan nilai input disimpan ke variabel state.
+   3. Flutter mengirim JSON ke Django menggunakan request.postJson().
+   4. Django menerima request, mem-parse JSON (json.loads), membuat object Product, dan menyimpan ke database.
+   5. Django mengembalikan JSON response (status success)
+   6. Flutter menerima respons, menampilkan SnackBar, dan kembali ke halaman list.
+   7. Flutter memanggil endpoint JSON (/json/) untuk mengambil data terbaru.
+   8. Response JSON dikonversi menjadi model Dart (productEntry).
+   9. Data ditampilkan dalam bentuk card pada ListView.builder.
+   
+6. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+   1. Mendesain model Django (Product) lengkap dengan field tambahan seperti is_signed, is_official_merch, stock, dan is_low_stock.
+   2. Membuat endpoint JSON sendiri (show_json) dengan struktur data yang disesuaikan untuk Flutter, tidak memakai serializers default.
+   3. Membuat model Dart (product_entry.dart) yang memetakan seluruh field dari Django satu per satu.
+   4. Membuat halaman list produk (ProductEntryListPage) yang mengambil data dari endpoint JSON dan menampilkannya melalui productEntryCard.
+   5. Mendesain UI card dan detail produk sesuai warna brand Supercopa dan field dari Django.
+   6. Membuat form create produk di Flutter dengan validasi TextFormField, Dropdown, dan Switch.
+   7. Membuat endpoint create_product_flutter untuk menerima JSON dari Flutter dan menyimpan ke database.
+   8. Menyusun koneksi login, logout, dan session menggunakan CookieRequest.
+   9. Mengatur konektivitas Django (ALLOWED_HOSTS, CORS, cookie settings) dan izin internet Android.
+   10. Menguji alur lengkap: input → create → JSON fetch → tampil di Flutter, sambil memperbaiki error yang muncul.
